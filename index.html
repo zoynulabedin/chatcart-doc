@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ChatCart — Merchant Documentation</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green: #25D366;
+      --green-dark: #128C7E;
+      --green-light: #dcf8e1;
+      --blue: #2563eb;
+      --blue-light: #eff6ff;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-500: #6b7280;
+      --gray-700: #374151;
+      --gray-900: #111827;
+      --sidebar-width: 260px;
+      --header-height: 60px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--gray-700);
+      background: #fff;
+    }
+
+    /* ── Header ── */
+    header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: var(--header-height);
+      background: #fff;
+      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      z-index: 100;
+      gap: 16px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--gray-900);
+    }
+
+    .logo-icon {
+      width: 32px; height: 32px;
+      background: var(--green);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 18px;
+    }
+
+    .header-badge {
+      background: var(--green-light);
+      color: var(--green-dark);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
+
+    .header-search {
+      margin-left: auto;
+      position: relative;
+    }
+
+    .header-search input {
+      width: 220px;
+      padding: 7px 12px 7px 34px;
+      border: 1px solid var(--gray-200);
+      border-radius: 8px;
+      font-size: 13px;
+      background: var(--gray-50);
+      outline: none;
+      transition: border-color .2s;
+    }
+
+    .header-search input:focus { border-color: var(--green); background: #fff; }
+
+    .search-icon {
+      position: absolute;
+      left: 10px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray-500);
+      font-size: 14px;
+      pointer-events: none;
+    }
+
+    #search-results {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0; right: 0;
+      background: #fff;
+      border: 1px solid var(--gray-200);
+      border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.1);
+      max-height: 300px;
+      overflow-y: auto;
+      display: none;
+      z-index: 200;
+    }
+
+    .search-item {
+      padding: 10px 14px;
+      cursor: pointer;
+      font-size: 13px;
+      border-bottom: 1px solid var(--gray-100);
+    }
+
+    .search-item:last-child { border-bottom: none; }
+    .search-item:hover { background: var(--gray-50); }
+    .search-item strong { color: var(--gray-900); display: block; font-size: 13px; }
+    .search-item span { color: var(--gray-500); font-size: 12px; }
+
+    /* ── Layout ── */
+    .layout {
+      display: flex;
+      padding-top: var(--header-height);
+      min-height: 100vh;
+    }
+
+    /* ── Sidebar ── */
+    aside {
+      width: var(--sidebar-width);
+      flex-shrink: 0;
+      position: fixed;
+      top: var(--header-height);
+      bottom: 0;
+      left: 0;
+      overflow-y: auto;
+      padding: 24px 0 40px;
+      border-right: 1px solid var(--gray-200);
+      background: var(--gray-50);
+    }
+
+    .nav-group { margin-bottom: 8px; }
+
+    .nav-group-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--gray-500);
+      padding: 8px 20px 4px;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 20px;
+      font-size: 13.5px;
+      color: var(--gray-700);
+      text-decoration: none;
+      border-radius: 0;
+      transition: background .15s, color .15s;
+      border-left: 3px solid transparent;
+      cursor: pointer;
+    }
+
+    .nav-link:hover { background: var(--gray-100); color: var(--gray-900); }
+    .nav-link.active { background: var(--green-light); color: var(--green-dark); border-left-color: var(--green); font-weight: 600; }
+    .nav-link .icon { width: 16px; text-align: center; font-size: 14px; flex-shrink: 0; }
+
+    /* ── Main content ── */
+    main {
+      margin-left: var(--sidebar-width);
+      flex: 1;
+      max-width: 860px;
+      padding: 48px 56px 80px;
+    }
+
+    /* ── Sections ── */
+    .doc-section {
+      margin-bottom: 64px;
+      scroll-margin-top: calc(var(--header-height) + 24px);
+    }
+
+    .section-eyebrow {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--green-dark);
+      margin-bottom: 8px;
+    }
+
+    h1 { font-size: 32px; font-weight: 800; color: var(--gray-900); line-height: 1.2; margin-bottom: 16px; }
+    h2 { font-size: 22px; font-weight: 700; color: var(--gray-900); margin: 40px 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--gray-200); }
+    h3 { font-size: 16px; font-weight: 700; color: var(--gray-900); margin: 28px 0 8px; }
+    p { margin-bottom: 14px; color: var(--gray-700); }
+    ul, ol { padding-left: 20px; margin-bottom: 14px; }
+    li { margin-bottom: 6px; }
+    a { color: var(--blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── Hero ── */
+    .hero {
+      background: linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%);
+      border-radius: 16px;
+      padding: 40px 44px;
+      color: #fff;
+      margin-bottom: 48px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: "💬";
+      position: absolute;
+      right: 40px; top: 24px;
+      font-size: 80px;
+      opacity: .15;
+    }
+
+    .hero h1 { color: #fff; font-size: 28px; margin-bottom: 8px; }
+    .hero p { color: rgba(255,255,255,.8); margin-bottom: 20px; font-size: 15px; }
+
+    .hero-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .hero-chip {
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.2);
+      color: #fff;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    /* ── Cards ── */
+    .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+
+    .card {
+      border: 1px solid var(--gray-200);
+      border-radius: 12px;
+      padding: 20px;
+      background: #fff;
+      transition: box-shadow .2s, border-color .2s;
+    }
+
+    .card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.07); border-color: var(--gray-300); }
+
+    .card-icon { font-size: 24px; margin-bottom: 10px; }
+    .card h3 { margin: 0 0 6px; font-size: 14px; }
+    .card p { font-size: 13px; color: var(--gray-500); margin: 0; }
+
+    /* ── Steps ── */
+    .steps { counter-reset: step; margin: 20px 0; }
+
+    .step {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--gray-100);
+    }
+
+    .step:last-child { border-bottom: none; margin-bottom: 0; }
+
+    .step-num {
+      counter-increment: step;
+      width: 32px; height: 32px;
+      background: var(--green);
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .step-content h3 { margin: 0 0 6px; font-size: 14px; }
+    .step-content p { margin: 0; font-size: 13.5px; color: var(--gray-700); }
+
+    /* ── Callouts ── */
+    .callout {
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 20px 0;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .callout-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    .callout-body { font-size: 13.5px; }
+    .callout-body strong { display: block; margin-bottom: 2px; color: var(--gray-900); }
+
+    .callout.info { background: var(--blue-light); border-left: 3px solid var(--blue); }
+    .callout.success { background: var(--green-light); border-left: 3px solid var(--green); }
+    .callout.warning { background: #fffbeb; border-left: 3px solid #f59e0b; }
+    .callout.danger { background: #fef2f2; border-left: 3px solid #ef4444; }
+
+    /* ── Code ── */
+    code {
+      font-family: 'SF Mono', Consolas, monospace;
+      font-size: 12.5px;
+      background: var(--gray-100);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--gray-900);
+    }
+
+    pre {
+      background: var(--gray-900);
+      border-radius: 10px;
+      padding: 20px;
+      overflow-x: auto;
+      margin: 16px 0;
+    }
+
+    pre code {
+      background: none;
+      color: #e5e7eb;
+      font-size: 13px;
+      padding: 0;
+    }
+
+    /* ── Table ── */
+    table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13.5px; }
+    th { background: var(--gray-50); font-weight: 600; color: var(--gray-700); text-align: left; padding: 10px 14px; border: 1px solid var(--gray-200); }
+    td { padding: 10px 14px; border: 1px solid var(--gray-200); color: var(--gray-700); vertical-align: top; }
+    tr:hover td { background: var(--gray-50); }
+
+    /* ── Badge ── */
+    .badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+    .badge.green { background: var(--green-light); color: var(--green-dark); }
+    .badge.blue { background: var(--blue-light); color: var(--blue); }
+    .badge.gray { background: var(--gray-100); color: var(--gray-500); }
+    .badge.yellow { background: #fffbeb; color: #92400e; }
+
+    /* ── FAQ ── */
+    .faq-item {
+      border: 1px solid var(--gray-200);
+      border-radius: 10px;
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+
+    .faq-q {
+      padding: 14px 18px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fff;
+      user-select: none;
+    }
+
+    .faq-q:hover { background: var(--gray-50); }
+
+    .faq-arrow { font-size: 12px; color: var(--gray-500); transition: transform .2s; }
+    .faq-item.open .faq-arrow { transform: rotate(180deg); }
+
+    .faq-a {
+      display: none;
+      padding: 0 18px 14px;
+      font-size: 13.5px;
+      color: var(--gray-700);
+      background: var(--gray-50);
+      border-top: 1px solid var(--gray-100);
+      padding-top: 12px;
+    }
+
+    .faq-item.open .faq-a { display: block; }
+
+    /* ── Screenshot placeholder ── */
+    .screen-mockup {
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      border-radius: 12px;
+      padding: 24px;
+      margin: 16px 0;
+      text-align: center;
+      color: var(--gray-500);
+      font-size: 13px;
+    }
+
+    .screen-mockup .bar {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 14px;
+      justify-content: flex-start;
+    }
+
+    .screen-mockup .dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+    }
+
+    .whatsapp-bubble {
+      background: var(--green-light);
+      border-radius: 12px 12px 0 12px;
+      padding: 10px 14px;
+      font-size: 13px;
+      color: var(--gray-900);
+      max-width: 280px;
+      text-align: left;
+      margin: 8px auto;
+      box-shadow: 0 1px 2px rgba(0,0,0,.08);
+    }
+
+    .whatsapp-reply {
+      background: #fff;
+      border-radius: 12px 12px 12px 0;
+      padding: 10px 14px;
+      font-size: 13px;
+      color: var(--gray-900);
+      max-width: 280px;
+      text-align: left;
+      margin: 8px auto;
+      box-shadow: 0 1px 2px rgba(0,0,0,.08);
+      border: 1px solid var(--gray-200);
+    }
+
+    /* ── Divider ── */
+    hr { border: none; border-top: 1px solid var(--gray-200); margin: 32px 0; }
+
+    /* ── Back to top ── */
+    #back-to-top {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      width: 40px; height: 40px;
+      background: var(--green);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      font-size: 18px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(37,211,102,.4);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      transition: transform .2s;
+    }
+
+    #back-to-top:hover { transform: translateY(-3px); }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      aside { display: none; }
+      main { margin-left: 0; padding: 32px 20px 60px; }
+      .card-grid { grid-template-columns: 1fr; }
+      .hero { padding: 28px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <a class="logo" href="#">
+    <div class="logo-icon">💬</div>
+    ChatCart
+  </a>
+  <span class="header-badge">User Manual</span>
+  <div class="header-search">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="search-input" placeholder="Search docs..." autocomplete="off" />
+    <div id="search-results"></div>
+  </div>
+</header>
+
+<!-- Layout -->
+<div class="layout">
+
+  <!-- Sidebar -->
+  <aside id="sidebar">
+    <nav>
+      <div class="nav-group">
+        <div class="nav-group-title">Getting Started</div>
+        <a class="nav-link" href="#overview"><span class="icon">🏠</span> Overview</a>
+        <a class="nav-link" href="#install"><span class="icon">📦</span> Installation</a>
+        <a class="nav-link" href="#quickstart"><span class="icon">⚡</span> Quick Start</a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-title">WhatsApp Setup</div>
+        <a class="nav-link" href="#setup-quick"><span class="icon">✨</span> Quick Setup</a>
+        <a class="nav-link" href="#setup-manual"><span class="icon">🔧</span> Manual Setup</a>
+        <a class="nav-link" href="#webhook"><span class="icon">🔗</span> Webhook Config</a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-title">Features</div>
+        <a class="nav-link" href="#ai-bot"><span class="icon">🤖</span> AI Chatbot</a>
+        <a class="nav-link" href="#templates"><span class="icon">📋</span> Message Templates</a>
+        <a class="nav-link" href="#abandoned-cart"><span class="icon">🛒</span> Abandoned Cart</a>
+        <a class="nav-link" href="#cod"><span class="icon">💵</span> COD Verification</a>
+        <a class="nav-link" href="#widget"><span class="icon">🪄</span> WhatsApp Widget</a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-title">Management</div>
+        <a class="nav-link" href="#analytics"><span class="icon">📊</span> Analytics</a>
+        <a class="nav-link" href="#settings"><span class="icon">⚙️</span> Settings</a>
+        <a class="nav-link" href="#plans"><span class="icon">💎</span> Plans & Limits</a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-title">Help</div>
+        <a class="nav-link" href="#faq"><span class="icon">❓</span> FAQ</a>
+        <a class="nav-link" href="#troubleshoot"><span class="icon">🛠️</span> Troubleshooting</a>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- Main -->
+  <main>
+
+    <!-- Hero -->
+    <div class="hero">
+      <p class="section-eyebrow" style="color:rgba(255,255,255,.6);">Merchant Documentation</p>
+      <h1>ChatCart User Manual</h1>
+      <p>Everything you need to connect WhatsApp to your Shopify store, automate order messages, and let AI handle customer support.</p>
+      <div class="hero-chips">
+        <span class="hero-chip">🤖 AI Chatbot</span>
+        <span class="hero-chip">📦 Order Notifications</span>
+        <span class="hero-chip">🛒 Abandoned Cart</span>
+        <span class="hero-chip">💵 COD Verification</span>
+        <span class="hero-chip">📊 Analytics</span>
+      </div>
+    </div>
+
+    <!-- Overview -->
+    <section class="doc-section" id="overview">
+      <p class="section-eyebrow">Getting Started</p>
+      <h1>What is ChatCart?</h1>
+      <p>ChatCart connects your Shopify store to WhatsApp Business. When a customer places an order, abandons their cart, or messages your WhatsApp number — ChatCart handles it automatically with AI-powered responses and real-time Shopify data.</p>
+
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-icon">🤖</div>
+          <h3>AI Chatbot</h3>
+          <p>Answers customer questions about orders, products, and returns using live Shopify data.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">📦</div>
+          <h3>Order Notifications</h3>
+          <p>Automatic WhatsApp messages for order confirmation, shipping, and delivery.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🛒</div>
+          <h3>Abandoned Cart</h3>
+          <p>Recover lost sales with automated cart reminder messages at 1h, 24h, and 72h.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">💵</div>
+          <h3>COD Verification</h3>
+          <p>Confirm cash-on-delivery orders via WhatsApp before processing to reduce returns.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🪄</div>
+          <h3>Store Widget</h3>
+          <p>A WhatsApp chat button on your store pages for direct customer contact.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">📊</div>
+          <h3>Analytics</h3>
+          <p>Track message delivery, read rates, cart recovery revenue, and COD confirmation rates.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Install -->
+    <section class="doc-section" id="install">
+      <h2>📦 Installation</h2>
+      <p>ChatCart is installed from the Shopify App Store like any other app.</p>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-content">
+            <h3>Install from Shopify App Store</h3>
+            <p>Search for <strong>ChatCart</strong> in the Shopify App Store and click <strong>Add app</strong>. You'll be redirected to your Shopify admin to approve permissions.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-content">
+            <h3>Approve permissions</h3>
+            <p>ChatCart needs access to <strong>orders, products, customers,</strong> and <strong>checkouts</strong> to send the right messages at the right time. Click <strong>Install app</strong>.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-content">
+            <h3>Connect WhatsApp</h3>
+            <p>After install, you'll land on the setup page. Connect your WhatsApp Business account using Quick Setup (recommended) or Manual Setup.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout info">
+        <span class="callout-icon">ℹ️</span>
+        <div class="callout-body">
+          <strong>What you need before starting</strong>
+          A Facebook account and a phone number not currently registered on personal WhatsApp. Your phone number will be used as your WhatsApp Business number.
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Start -->
+    <section class="doc-section" id="quickstart">
+      <h2>⚡ Quick Start Checklist</h2>
+      <p>Follow these steps to go live in under 10 minutes.</p>
+
+      <table>
+        <thead>
+          <tr><th>Step</th><th>Action</th><th>Where</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td>Connect WhatsApp via Quick Setup</td><td>App → WhatsApp Setup</td></tr>
+          <tr><td>2</td><td>Verify webhook in Meta Developer Console</td><td>Meta Dashboard</td></tr>
+          <tr><td>3</td><td>Enable message templates</td><td>App → Templates</td></tr>
+          <tr><td>4</td><td>Send a test message</td><td>App → WhatsApp Setup → Test</td></tr>
+          <tr><td>5</td><td>Install the store widget</td><td>App → Widget → Enable</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <hr />
+
+    <!-- Quick Setup -->
+    <section class="doc-section" id="setup-quick">
+      <p class="section-eyebrow">WhatsApp Setup</p>
+      <h2>✨ Quick Setup (Recommended)</h2>
+      <p>Quick Setup uses Meta's Embedded Signup to connect your WhatsApp Business account in one click — no copy-pasting tokens or IDs.</p>
+
+      <div class="callout success">
+        <span class="callout-icon">✅</span>
+        <div class="callout-body">
+          <strong>What Quick Setup does automatically</strong>
+          Creates your WhatsApp Business Account, subscribes webhooks, registers your phone number, and encrypts your credentials — all in about 3 minutes.
+        </div>
+      </div>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-content">
+            <h3>Go to WhatsApp Setup</h3>
+            <p>In the ChatCart app, click <strong>WhatsApp Setup</strong> in the sidebar. You'll see the Quick Setup card at the top.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-content">
+            <h3>Click "Connect WhatsApp Business"</h3>
+            <p>A Facebook popup will open. Log in with your Facebook account that has admin access to your Meta Business account.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-content">
+            <h3>Follow the Facebook wizard</h3>
+            <p>Select or create your <strong>WhatsApp Business Account (WABA)</strong>, add your business phone number, and verify it via SMS or call.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-content">
+            <h3>Wait for connection</h3>
+            <p>ChatCart automatically saves your credentials. The setup page will refresh showing <strong>"WhatsApp Connected"</strong> with your phone number and business name.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout warning">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-body">
+          <strong>Phone number requirement</strong>
+          The phone number you add must NOT be currently active on personal WhatsApp or WhatsApp Business app. Use a dedicated business number.
+        </div>
+      </div>
+    </section>
+
+    <!-- Manual Setup -->
+    <section class="doc-section" id="setup-manual">
+      <h2>🔧 Manual Setup</h2>
+      <p>Use Manual Setup if you already have a Meta Business account and WhatsApp Business Account with credentials.</p>
+
+      <h3>Where to find your credentials</h3>
+      <table>
+        <thead>
+          <tr><th>Field</th><th>Where to find it</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Phone Number ID</strong></td>
+            <td>Meta Dashboard → Your App → WhatsApp → API Setup → Phone Number ID</td>
+          </tr>
+          <tr>
+            <td><strong>WABA ID</strong></td>
+            <td>Meta Business Manager → WhatsApp Accounts → click your account → ID shown at top</td>
+          </tr>
+          <tr>
+            <td><strong>Access Token</strong></td>
+            <td>Meta Business Manager → System Users → Generate token (select whatsapp_business_messaging scope)</td>
+          </tr>
+          <tr>
+            <td><strong>Webhook Verify Token</strong></td>
+            <td>Any secret string you choose — you'll enter the same string in Meta's webhook config</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-content">
+            <h3>Go to Manual Setup</h3>
+            <p>In the app, go to <strong>WhatsApp Setup → Use Manual Setup</strong>. Complete steps 1 and 2 (Meta Business Account setup) then move to Step 3: API Credentials.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-content">
+            <h3>Enter your credentials</h3>
+            <p>Fill in Phone Number ID, WABA ID, Access Token, and your business phone number. Click <strong>Save credentials</strong>.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-content">
+            <h3>Send a test message</h3>
+            <p>Enter your phone number (with country code, no +) and click <strong>Send test message</strong>. You should receive a WhatsApp message within seconds.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout info">
+        <span class="callout-icon">🔒</span>
+        <div class="callout-body">
+          <strong>Security</strong>
+          All access tokens are encrypted at rest using AES-256-GCM encryption before being stored in the database.
+        </div>
+      </div>
+    </section>
+
+    <!-- Webhook -->
+    <section class="doc-section" id="webhook">
+      <h2>🔗 Webhook Configuration</h2>
+      <p>The webhook allows Meta to send incoming customer messages to ChatCart so the AI bot can respond.</p>
+
+      <h3>Webhook settings</h3>
+      <table>
+        <thead>
+          <tr><th>Setting</th><th>Value</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Callback URL</strong></td>
+            <td><code>https://chatcart.appaza.dev/api/whatsapp/webhook</code></td>
+          </tr>
+          <tr>
+            <td><strong>Verify Token</strong></td>
+            <td>The webhook verify token you set in Manual Setup, or your <code>CRON_SECRET</code> value</td>
+          </tr>
+          <tr>
+            <td><strong>Subscribed fields</strong></td>
+            <td><code>messages</code> (required for AI chatbot to work)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-content">
+            <h3>Open Meta Developer Console</h3>
+            <p>Go to <strong>developers.facebook.com</strong> → your app → <strong>WhatsApp → Configuration</strong>.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-content">
+            <h3>Add webhook URL</h3>
+            <p>Click <strong>Edit</strong> next to Webhook. Enter the Callback URL and Verify Token. Click <strong>Verify and save</strong>.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-content">
+            <h3>Subscribe to messages</h3>
+            <p>After saving, click <strong>Manage</strong> next to Webhook fields. Find <code>messages</code> and click <strong>Subscribe</strong>.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout warning">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-body">
+          <strong>Without messages subscription, the AI chatbot will not work.</strong>
+          The webhook must be verified and the messages field must be subscribed for ChatCart to receive and reply to incoming WhatsApp messages.
+        </div>
+      </div>
+    </section>
+
+    <hr />
+
+    <!-- AI Bot -->
+    <section class="doc-section" id="ai-bot">
+      <p class="section-eyebrow">Features</p>
+      <h2>🤖 AI Chatbot</h2>
+      <p>The AI chatbot automatically replies to customer WhatsApp messages with accurate information pulled live from your Shopify store.</p>
+
+      <h3>How it works</h3>
+      <div class="screen-mockup">
+        <div style="display:flex; gap:16px; justify-content:center; align-items:flex-start; padding:8px 0;">
+          <div style="text-align:center; font-size:12px; color:var(--gray-500);">
+            <div class="whatsapp-bubble">Hi! Do you have blue shirts in size M?</div>
+            <div style="margin-top:4px;">Customer</div>
+          </div>
+          <div style="text-align:center; font-size:12px; color:var(--gray-500);">
+            <div class="whatsapp-reply">Yes! 👕 We have the Blue Oxford Shirt in M for $29.99 — currently in stock. Shop here: yourstore.com/products/blue-oxford</div>
+            <div style="margin-top:4px;">ChatCart AI</div>
+          </div>
+        </div>
+      </div>
+
+      <h3>Supported intents</h3>
+      <table>
+        <thead>
+          <tr><th>Customer says</th><th>Intent</th><th>What AI does</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>"Where is my order?"</td>
+            <td><span class="badge blue">ORDER_STATUS</span></td>
+            <td>Fetches their orders from Shopify by phone number, reports status + tracking</td>
+          </tr>
+          <tr>
+            <td>"Do you have blue shirts?"</td>
+            <td><span class="badge green">PRODUCT_QUERY</span></td>
+            <td>Fetches live product catalog with prices and stock status</td>
+          </tr>
+          <tr>
+            <td>"What would you recommend?"</td>
+            <td><span class="badge green">RECOMMENDATION</span></td>
+            <td>Shows available products and suggests based on context</td>
+          </tr>
+          <tr>
+            <td>"I want to return my order"</td>
+            <td><span class="badge yellow">RETURN_REFUND</span></td>
+            <td>Looks up customer orders, guides through return process</td>
+          </tr>
+          <tr>
+            <td>"Hi / Hello"</td>
+            <td><span class="badge gray">GREETING</span></td>
+            <td>Sends a welcome message instantly (no AI needed)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout info">
+        <span class="callout-icon">ℹ️</span>
+        <div class="callout-body">
+          <strong>The AI only uses real data</strong>
+          It never invents product names, prices, or order details. If no data is found for a query, it tells the customer to contact your support team.
+        </div>
+      </div>
+
+      <h3>Conversation memory</h3>
+      <p>ChatCart remembers the last <strong>10 messages</strong> per customer session, so the AI understands context across a conversation (e.g., follow-up questions about the same order).</p>
+    </section>
+
+    <!-- Templates -->
+    <section class="doc-section" id="templates">
+      <h2>📋 Message Templates</h2>
+      <p>Templates are pre-approved WhatsApp messages sent automatically when Shopify events occur. They must be approved by Meta before they can be used.</p>
+
+      <h3>Default templates included</h3>
+      <table>
+        <thead>
+          <tr><th>Template</th><th>Trigger</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Order confirmation</td>
+            <td>Order placed</td>
+            <td><span class="badge green">Auto-approved</span></td>
+          </tr>
+          <tr>
+            <td>Order shipped</td>
+            <td>Fulfillment created</td>
+            <td><span class="badge green">Auto-approved</span></td>
+          </tr>
+          <tr>
+            <td>Order delivered</td>
+            <td>Fulfillment delivered</td>
+            <td><span class="badge green">Auto-approved</span></td>
+          </tr>
+          <tr>
+            <td>Order cancelled</td>
+            <td>Order cancelled</td>
+            <td><span class="badge green">Auto-approved</span></td>
+          </tr>
+          <tr>
+            <td>Abandoned cart – 1h</td>
+            <td>Cart abandoned 1 hour ago</td>
+            <td><span class="badge yellow">Pending approval</span></td>
+          </tr>
+          <tr>
+            <td>Abandoned cart – 24h</td>
+            <td>Cart abandoned 24 hours ago</td>
+            <td><span class="badge yellow">Pending approval</span></td>
+          </tr>
+          <tr>
+            <td>Abandoned cart – 72h</td>
+            <td>Cart abandoned 72 hours ago</td>
+            <td><span class="badge yellow">Pending approval</span></td>
+          </tr>
+          <tr>
+            <td>COD verification</td>
+            <td>Cash-on-delivery order placed</td>
+            <td><span class="badge yellow">Pending approval</span></td>
+          </tr>
+          <tr>
+            <td>Welcome message</td>
+            <td>First contact from customer</td>
+            <td><span class="badge yellow">Pending approval</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Editing a template</h3>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-content">
+            <h3>Go to Templates page</h3>
+            <p>In the app sidebar click <strong>Templates</strong>. You'll see all templates with their current status.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-content">
+            <h3>Click Edit on a template</h3>
+            <p>You can edit the <strong>message body text</strong>. Use <code>{{variable_name}}</code> placeholders — for example <code>{{customer_name}}</code> or <code>{{order_number}}</code>.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num"></div>
+          <div class="step-content">
+            <h3>Enable or disable</h3>
+            <p>Toggle a template off to stop sending that message type without deleting it.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout warning">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-body">
+          <strong>Meta approval required for marketing templates</strong>
+          Abandoned cart and welcome templates are classified as marketing messages. They must be approved by Meta (usually within 24 hours) before they can be sent.
+        </div>
+      </div>
+    </section>
+
+    <!-- Abandoned Cart -->
+    <section class="doc-section" id="abandoned-cart">
+      <h2>🛒 Abandoned Cart Recovery</h2>
+      <p>When a customer adds items to their cart but doesn't check out, ChatCart sends automatic reminders at three intervals.</p>
+
+      <table>
+        <thead>
+          <tr><th>Time after abandonment</th><th>Template</th><th>Includes</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>1 hour</strong></td>
+            <td>abandoned_cart_1h</td>
+            <td>Customer name, recovery link</td>
+          </tr>
+          <tr>
+            <td><strong>24 hours</strong></td>
+            <td>abandoned_cart_24h</td>
+            <td>Customer name, 10% discount code, recovery link</td>
+          </tr>
+          <tr>
+            <td><strong>72 hours</strong></td>
+            <td>abandoned_cart_72h</td>
+            <td>Customer name, 15% discount code, recovery link (last chance)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout info">
+        <span class="callout-icon">ℹ️</span>
+        <div class="callout-body">
+          <strong>Requirement</strong>
+          Abandoned cart messages only send if the customer provided a phone number during checkout. The abandoned_cart templates must also be approved by Meta.
+        </div>
+      </div>
+
+      <h3>Monitoring recovery</h3>
+      <p>Go to <strong>Analytics → Abandoned Carts</strong> to see how many carts were recovered and the total recovery revenue for the period.</p>
+    </section>
+
+    <!-- COD -->
+    <section class="doc-section" id="cod">
+      <h2>💵 COD Verification</h2>
+      <p>For cash-on-delivery orders, ChatCart sends a WhatsApp message with confirm/cancel buttons before processing the order. This reduces failed deliveries and unnecessary shipping costs.</p>
+
+      <div class="screen-mockup">
+        <div style="max-width:300px; margin:0 auto; text-align:left;">
+          <div class="whatsapp-reply" style="border-radius:12px 12px 12px 0; max-width:100%; background:#fff;">
+            Hi Sarah, please confirm your COD order #1042 for 89.00 USD. Tap below:
+            <div style="display:flex; gap:8px; margin-top:10px;">
+              <button style="flex:1; background:var(--green); color:#fff; border:none; padding:8px; border-radius:6px; font-size:12px; cursor:pointer;">✅ Confirm</button>
+              <button style="flex:1; background:#fee2e2; color:#dc2626; border:none; padding:8px; border-radius:6px; font-size:12px; cursor:pointer;">❌ Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h3>How it works</h3>
+      <ol>
+        <li>Customer places a COD order on your Shopify store</li>
+        <li>ChatCart detects the payment gateway contains "cash"</li>
+        <li>A WhatsApp interactive message is sent with Confirm / Cancel buttons</li>
+        <li>Customer taps Confirm → order is processed normally</li>
+        <li>Customer taps Cancel → order is cancelled, analytics updated</li>
+      </ol>
+
+      <div class="callout success">
+        <span class="callout-icon">✅</span>
+        <div class="callout-body">
+          <strong>COD stats in Analytics</strong>
+          Track how many COD orders were confirmed vs cancelled under Analytics → COD Verification.
+        </div>
+      </div>
+    </section>
+
+    <!-- Widget -->
+    <section class="doc-section" id="widget">
+      <h2>🪄 WhatsApp Widget</h2>
+      <p>The widget adds a WhatsApp chat button to your store so customers can contact you directly.</p>
+
+      <h3>Widget settings</h3>
+      <table>
+        <thead>
+          <tr><th>Setting</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Position</strong></td><td>Bottom-right or bottom-left corner of the page</td></tr>
+          <tr><td><strong>Button color</strong></td><td>Default WhatsApp green — customizable</td></tr>
+          <tr><td><strong>Pre-filled message</strong></td><td>Message pre-typed when customer opens WhatsApp</td></tr>
+          <tr><td><strong>Show on pages</strong></td><td>Control which page types show the widget (product, cart, home, collection)</td></tr>
+          <tr><td><strong>Welcome bubble</strong></td><td>A pop-up text above the button after a delay</td></tr>
+          <tr><td><strong>Product button</strong></td><td>An "Order via WhatsApp" button on product pages</td></tr>
+          <tr><td><strong>Delay</strong></td><td>Seconds before the widget appears after page load</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Enabling the widget</h3>
+      <p>Go to <strong>Widget</strong> in the sidebar, toggle <strong>Enable widget</strong> on, configure your settings, and click <strong>Save</strong>. The widget appears on your live store immediately.</p>
+    </section>
+
+    <hr />
+
+    <!-- Analytics -->
+    <section class="doc-section" id="analytics">
+      <p class="section-eyebrow">Management</p>
+      <h2>📊 Analytics</h2>
+      <p>The Analytics page shows a 30-day summary of your WhatsApp performance.</p>
+
+      <table>
+        <thead>
+          <tr><th>Metric</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Messages Sent</strong></td><td>Total WhatsApp messages dispatched</td></tr>
+          <tr><td><strong>Delivered</strong></td><td>Messages confirmed delivered to customer's device</td></tr>
+          <tr><td><strong>Read Rate</strong></td><td>% of messages opened and read by the customer</td></tr>
+          <tr><td><strong>Carts Recovered</strong></td><td>Abandoned carts where customer completed checkout after receiving a reminder</td></tr>
+          <tr><td><strong>Recovery Revenue</strong></td><td>Total order value from recovered carts</td></tr>
+          <tr><td><strong>COD Confirmed</strong></td><td>COD orders confirmed via WhatsApp</td></tr>
+          <tr><td><strong>COD Rejected</strong></td><td>COD orders cancelled by customer</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Settings -->
+    <section class="doc-section" id="settings">
+      <h2>⚙️ Settings</h2>
+
+      <h3>Business hours</h3>
+      <p>Set the hours during which automated messages are sent. Messages triggered outside these hours are queued or skipped depending on your <strong>Fallback behavior</strong> setting.</p>
+
+      <h3>Default language</h3>
+      <p>Sets the language preference passed to the AI chatbot. The AI will reply in this language when possible.</p>
+
+      <h3>Timezone</h3>
+      <p>Used for business hours calculations. Set this to your store's local timezone.</p>
+
+      <h3>Fallback behavior</h3>
+      <table>
+        <thead>
+          <tr><th>Option</th><th>What happens outside business hours</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>log_only</code></td><td>Message is logged but not sent</td></tr>
+          <tr><td><code>send_anyway</code></td><td>Message is sent regardless of hours</td></tr>
+          <tr><td><code>queue</code></td><td>Message is queued to send when hours resume</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Plans -->
+    <section class="doc-section" id="plans">
+      <h2>💎 Plans & Limits</h2>
+
+      <table>
+        <thead>
+          <tr><th>Plan</th><th>Monthly messages</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Free</strong></td><td>50 messages</td></tr>
+          <tr><td><strong>Starter</strong></td><td>500 messages</td></tr>
+          <tr><td><strong>Growth</strong></td><td>2,000 messages</td></tr>
+          <tr><td><strong>Pro</strong></td><td>10,000 messages</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout info">
+        <span class="callout-icon">ℹ️</span>
+        <div class="callout-body">
+          <strong>Message counting</strong>
+          Only outbound template messages (order notifications, cart reminders) count against your quota. AI chatbot replies in the 24-hour service window are free-form messages and counted separately by Meta.
+        </div>
+      </div>
+
+      <p>To upgrade your plan, go to <strong>Settings → Plan</strong> and select the plan you need.</p>
+    </section>
+
+    <hr />
+
+    <!-- FAQ -->
+    <section class="doc-section" id="faq">
+      <p class="section-eyebrow">Help</p>
+      <h2>❓ Frequently Asked Questions</h2>
+
+      <div class="faq-item">
+        <div class="faq-q">
+          Why is the AI chatbot not replying to customer messages?
+          <span class="faq-arrow">▼</span>
+        </div>
+        <div class="faq-a">
+          The most common reasons: (1) The Meta webhook is not subscribed to the <code>messages</code> field — go to Meta Developer Console → WhatsApp → Configuration and subscribe. (2) Your WhatsApp account is a test number — test numbers cannot receive real messages from customers. (3) The AI provider API key is not set in your environment variables.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">
+          The customer's phone number format — what is accepted?
+          <span class="faq-arrow">▼</span>
+        </div>
+        <div class="faq-a">
+          Phone numbers should include the country code without the + sign. For example, a Bangladesh number would be <code>8801712345678</code>. Make sure your customers enter their phone number in this format at checkout.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">
+          My templates are still "Pending" — what should I do?
+          <span class="faq-arrow">▼</span>
+        </div>
+        <div class="faq-a">
+          Meta reviews marketing templates (abandoned cart, welcome) within 24–48 hours. Utility templates (order confirmation, shipping) are usually approved faster. If a template is rejected, you'll need to edit the text and resubmit from Meta Business Manager.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">
+          Can I use my existing WhatsApp Business number?
+          <span class="faq-arrow">▼</span>
+        </div>
+        <div class="faq-a">
+          Only if it is not registered on the WhatsApp Business App. Once a number is used with the WhatsApp Business API (via Meta Cloud API), it cannot be used on the regular app simultaneously.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">
+          How do I change my connected WhatsApp number?
+          <span class="faq-arrow">▼</span>
+        </div>
+        <div class="faq-a">
+          Go to <strong>WhatsApp Setup → Update Credentials</strong>. You can re-run Quick Setup to connect a different number, or enter new credentials via Manual Setup. The old number's connection will be replaced.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">
+          Abandoned cart messages are not being sent — why?
+          <span class="faq-arrow">▼</span>
+        </div>
+        <div class="faq-a">
+          Check these: (1) The abandoned cart template must be <strong>approved by Meta</strong> — pending templates won't send. (2) The customer must have entered a phone number at checkout. (3) The cron job that processes abandoned carts must be running — contact support if you see no activity in the Abandoned Carts page.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">
+          The AI replied with "I'm having trouble" — what happened?
+          <span class="faq-arrow">▼</span>
+        </div>
+        <div class="faq-a">
+          This means the AI request to OpenRouter failed. Common causes: the AI model name is incorrect (check <code>OPENROUTER_MODEL</code> env var — use <code>meta-llama/llama-3.3-70b-instruct:free</code>), the API key is invalid, or the model hit its rate limit. Check your Coolify logs for <code>[AI bot error]</code> entries.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">
+          Will the AI make up product information?
+          <span class="faq-arrow">▼</span>
+        </div>
+        <div class="faq-a">
+          No. The AI is instructed never to invent product names, prices, or order details. It only uses data fetched live from your Shopify store. If no data is found, it tells the customer it cannot help and directs them to contact your team.
+        </div>
+      </div>
+    </section>
+
+    <!-- Troubleshoot -->
+    <section class="doc-section" id="troubleshoot">
+      <h2>🛠️ Troubleshooting</h2>
+
+      <h3>Webhook verification fails</h3>
+      <div class="callout danger">
+        <span class="callout-icon">❌</span>
+        <div class="callout-body">
+          <strong>Error: "Webhook verification failed"</strong>
+          The verify token you entered in Meta doesn't match what ChatCart expects. Make sure you're using the same token you saved in Manual Setup, or use the value of your <code>CRON_SECRET</code> environment variable.
+        </div>
+      </div>
+
+      <h3>Messages not sending — "WhatsApp not configured"</h3>
+      <p>The shop has no active WhatsApp configuration. Go to <strong>WhatsApp Setup</strong> and complete the connection. Make sure the setup shows <strong>"WhatsApp Connected"</strong>.</p>
+
+      <h3>Phone registration failed</h3>
+      <p>Error code <strong>133005</strong> means a PIN is already set — this is normal and harmless. Any other phone registration error means the phone number ID or access token is wrong.</p>
+
+      <h3>Token expired</h3>
+      <p>User access tokens expire. For production, always use a <strong>System User token</strong> from Meta Business Manager which does not expire. Go to Manual Setup → Update Credentials to enter a new token.</p>
+
+      <h3>Reading Coolify logs</h3>
+      <p>Open your Coolify dashboard → ChatCart service → <strong>Logs</strong>. Key log lines to look for:</p>
+      <pre><code># Webhook receiving messages ✅
+POST /api/whatsapp/webhook 200
+
+# AI context fetching ✅
+[context-fetcher] intent=PRODUCT_QUERY shop=yourstore.myshopify.com
+
+# AI error ❌
+[AI bot error]: OpenRouter error 400: ...
+
+# No session found ❌
+[context-fetcher] No Shopify session found for yourstore.myshopify.com</code></pre>
+
+      <h3>Still stuck?</h3>
+      <p>Email support at <a href="mailto:support@chatcart.app">support@chatcart.app</a> with your shop domain and a screenshot of the Coolify logs showing the error.</p>
+    </section>
+
+  </main>
+</div>
+
+<!-- Back to top -->
+<button id="back-to-top" title="Back to top">↑</button>
+
+<script>
+  const HEADER_H = 68;
+
+  // ── Smooth scroll for all nav links ─────────────────────────────────────────
+  document.querySelectorAll('a.nav-link[href^="#"]').forEach(link => {
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+      const id = this.getAttribute('href').slice(1);
+      const target = document.getElementById(id);
+      if (!target) return;
+      const top = target.getBoundingClientRect().top + window.scrollY - HEADER_H;
+      window.scrollTo({ top, behavior: 'smooth' });
+      setActive(id);
+    });
+  });
+
+  // ── Set active nav link ──────────────────────────────────────────────────────
+  function setActive(id) {
+    document.querySelectorAll('a.nav-link').forEach(l => {
+      l.classList.toggle('active', l.getAttribute('href') === '#' + id);
+    });
+  }
+
+  // ── Scroll spy ───────────────────────────────────────────────────────────────
+  const sections = Array.from(document.querySelectorAll('.doc-section[id]'));
+
+  window.addEventListener('scroll', () => {
+    const scrollY = window.scrollY + HEADER_H + 24;
+    let current = sections[0].id;
+    sections.forEach(sec => {
+      if (sec.offsetTop <= scrollY) current = sec.id;
+    });
+    setActive(current);
+  }, { passive: true });
+
+  // Set initial active on load
+  setActive(sections[0].id);
+
+  // ── Back to top ──────────────────────────────────────────────────────────────
+  const btn = document.getElementById('back-to-top');
+  window.addEventListener('scroll', () => {
+    btn.style.display = window.scrollY > 400 ? 'flex' : 'none';
+  }, { passive: true });
+  btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+  // ── FAQ accordion ────────────────────────────────────────────────────────────
+  document.querySelectorAll('.faq-q').forEach(q => {
+    q.addEventListener('click', () => q.closest('.faq-item').classList.toggle('open'));
+  });
+
+  // ── Search ───────────────────────────────────────────────────────────────────
+  const searchIndex = [
+    { title: 'Quick Setup', section: 'setup-quick', desc: 'Connect WhatsApp in one click using Meta Embedded Signup' },
+    { title: 'Manual Setup', section: 'setup-manual', desc: 'Enter Phone Number ID, WABA ID, and Access Token manually' },
+    { title: 'Webhook Configuration', section: 'webhook', desc: 'Set up Meta webhook to receive incoming messages' },
+    { title: 'AI Chatbot', section: 'ai-bot', desc: 'AI replies to customer WhatsApp messages with live Shopify data' },
+    { title: 'Message Templates', section: 'templates', desc: 'Order confirmation, shipping, abandoned cart templates' },
+    { title: 'Abandoned Cart', section: 'abandoned-cart', desc: 'Automatic cart recovery reminders at 1h, 24h, 72h' },
+    { title: 'COD Verification', section: 'cod', desc: 'Confirm cash-on-delivery orders via WhatsApp buttons' },
+    { title: 'WhatsApp Widget', section: 'widget', desc: 'Chat button on your store pages' },
+    { title: 'Analytics', section: 'analytics', desc: 'Message delivery rates, cart recovery revenue, COD stats' },
+    { title: 'Plans & Limits', section: 'plans', desc: 'Free: 50 messages, Starter: 500, Growth: 2000, Pro: 10000' },
+    { title: 'FAQ', section: 'faq', desc: 'Frequently asked questions and answers' },
+    { title: 'Troubleshooting', section: 'troubleshoot', desc: 'Fix webhook failures, token errors, AI not responding' },
+    { title: 'Installation', section: 'install', desc: 'Install ChatCart from Shopify App Store' },
+    { title: 'Phone number requirement', section: 'setup-quick', desc: 'Phone must not be active on personal WhatsApp' },
+    { title: 'Access token expired', section: 'troubleshoot', desc: 'Use System User token for production' },
+    { title: 'Business hours', section: 'settings', desc: 'Control when messages are sent' },
+  ];
+
+  const input = document.getElementById('search-input');
+  const results = document.getElementById('search-results');
+
+  function goToSection(id) {
+    const target = document.getElementById(id);
+    if (!target) return;
+    const top = target.getBoundingClientRect().top + window.scrollY - HEADER_H;
+    window.scrollTo({ top, behavior: 'smooth' });
+    setActive(id);
+    results.style.display = 'none';
+    input.value = '';
+  }
+
+  input.addEventListener('input', () => {
+    const q = input.value.trim().toLowerCase();
+    if (!q) { results.style.display = 'none'; return; }
+
+    const matches = searchIndex.filter(item =>
+      item.title.toLowerCase().includes(q) || item.desc.toLowerCase().includes(q)
+    ).slice(0, 6);
+
+    if (!matches.length) { results.style.display = 'none'; return; }
+
+    results.innerHTML = matches.map(item =>
+      `<div class="search-item" data-section="${item.section}">
+        <strong>${item.title}</strong>
+        <span>${item.desc}</span>
+      </div>`
+    ).join('');
+
+    results.querySelectorAll('.search-item').forEach(el => {
+      el.addEventListener('click', () => goToSection(el.dataset.section));
+    });
+
+    results.style.display = 'block';
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.header-search')) results.style.display = 'none';
+  });
+</script>
+
+</body>
+</html>
